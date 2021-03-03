@@ -28,7 +28,8 @@ dat_reduce$ECR_status_last_simplified<- as.factor(dat_reduce$ECR_status_last_sim
 model1<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
            ECR_status_last_simplified+
            offset(log(Num_publications_first))+
-           Institution_size_first,
+           Institution_size_first+
+           Institution_size_first*ECR_status_first_simplified,
          data=dat_reduce,
          family = quasipoisson)
 summary(model1)
@@ -74,8 +75,22 @@ ggbox_1b <- ggplot(data=subset(dat_reduce,!is.na(gender_last)),
   annotate("text", label = "bold(B)", 
            x=0.5, y = 44, parse = TRUE,
            size = 7) 
+#figure 1C
+interact <- plot_model(hx, type = "int",
+                       title="",
+                       axis.title = c("", "Number of preprint articles"),
+                       #   axis.labels = c("ECR_status_first_simplified ="),
+                       legend.title = "")+
+  theme_classic(
+    base_size = 15,
+    base_family ="Times",
+  )+
+  annotate("text", label = "bold(C)", 
+           x=0.5, y = 7.2, parse = TRUE,
+          size = 7) 
 # Combine using patchwork
 combined_total <- ggbox_1a+
   ggbox_1b+
-  plot_layout(ncol = 2, nrow = 1)
+interact
+  plot_layout(ncol = 3)
 combined_total
