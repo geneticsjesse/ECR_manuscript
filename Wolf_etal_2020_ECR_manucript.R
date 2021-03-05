@@ -1,9 +1,6 @@
-# Title: GLM and plots for Wolf_etal_2020 ECR Manuscript
-# Purpose: Generate Generalized Linear Model and plots
+# Title: Scripts for Wolf_etal_2020 ECR Manuscript
 # Author: JW
 # Input: Final dataset in .csv format
-# Date: December 28 2020
-# Output: GLM results and Figure 1
 
 # Environment setup
 pkgs<- c('tidyverse','ggplot2', 'extrafont', 'sjPlot', 'patchwork',
