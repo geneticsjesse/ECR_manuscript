@@ -75,7 +75,57 @@ model1<- glm(Num_preprints_first ~ ECR_status_first_simplified +
          family = quasipoisson)
 summary(model1)
 
-# 4) Figure 1
+# Are fixed effects (including interaction term) significant?
+# Step 1: Create models.
+# Step 2: Compare them.
+
+# 4) Create a series of models, building up from null model to full model by adding one term at a time.
+
+# null model
+model_null<- glm(Num_preprints_first ~ 1 +
+                   offset(log(Num_publications_first)),
+                data=dat_reduce,
+                family = quasipoisson)
+
+# add first author ECR status together with offset, which is associated
+model_first<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
+                offset(log(Num_publications_first)),
+                data=dat_reduce,
+                family = quasipoisson)
+
+# add last author ECR status
+model_firstlast<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
+                offset(log(Num_publications_first))+
+                ECR_status_last_simplified,
+                data=dat_reduce,
+                family = quasipoisson)
+
+# add institution size
+model_firstlastsize<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
+                        offset(log(Num_publications_first))+
+                        ECR_status_last_simplified+
+                        Institution_size_first,
+                        data=dat_reduce,
+                        family = quasipoisson)
+
+# add the interaction - this is exactly the same as the "model_new"
+model_firstlastsizeint<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
+                          offset(log(Num_publications_first))+
+                          ECR_status_last_simplified+
+                          Institution_size_first+
+                          ECR_status_first_simplified:Institution_size_first,
+                          data=dat_reduce,
+                          family = quasipoisson)
+
+# 5) Compare models stepwise to see if adding each term made the model significantly better than the previous simpler model.
+
+anova(model_null, model_first, test="Chi") # does adding first author status significantly improve the model?
+anova(model_first, model_firstlast, test="Chi") # does adding last author status significantly improve the model?
+anova(model_firstlast, model_firstlastsize, test="Chi") # does adding institution size significantly improve the model?
+anova(model_firstlastsize, model_firstlastsizeint, test="Chi") # does adding the interaction significantly improve the model?
+
+
+# 6) Figures
 
 #Figure 1a
 mycol <- c("#56B4E9", "#D55E00")
