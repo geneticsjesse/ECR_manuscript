@@ -63,7 +63,7 @@ anova(model_first, model_firstlast, test="Chi") # does adding last author status
 anova(model_firstlast, model_firstlastsize, test="Chi") # does adding institution size significantly improve the model?
 anova(model_firstlastsize, model_firstlastsizeint, test="Chi") # does adding the interaction significantly improve the model?
 
-# 3) Generalized Linear Model 
+# 3) Final Generalized Linear Model 
 
 model1<- glm(Num_preprints_first ~ ECR_status_first_simplified + 
            ECR_status_last_simplified+
@@ -74,18 +74,13 @@ model1<- glm(Num_preprints_first ~ ECR_status_first_simplified +
          family = quasipoisson)
 summary(model1)
 
-# Add predicted data to data frame and interaction plot column to group for plots
-dat_reduce$fit <- predict(hx)
-dat_reduce$interact <- paste(dat_reduce$Institution_size_first, "x", dat_reduce$ECR_status_first_simplified)
-dat_reduce$interact<- as.factor (dat_reduce$interact)
-str(dat_reduce)
-
 # 4) Figures
 
 #Figure 1a
 mycol<- c("#56B4E9", "#D55E00")
+mycol2 <- c("#56B4E9", "#D55E00","#E1BE6A")
 ggbox_1a <- ggplot(data=dat_reduce,
-                   aes(x= ECR_status_first_simplified, y=fit,
+                   aes(x= ECR_status_first_simplified, y=Num_preprints_first,
                        fill=ECR_status_first_simplified))+
   geom_violin(draw_quantiles = c(.25, .5, .75, .95), alpha=0.5)+#, scale = "count")+
   geom_boxplot(width=0.4, outlier.shape = NA, color = "black",fill = "white", 
@@ -102,10 +97,9 @@ ggbox_1a <- ggplot(data=dat_reduce,
   annotate("text", label = "bold(A)", 
            x=0.5, y = 5, parse = TRUE,
            size = 7)
-ggbox_1a
 #Figure 1b
 ggbox_1b <- ggplot(data=dat_reduce,
-                   aes(ECR_status_last_simplified,fit,
+                   aes(ECR_status_last_simplified,Num_preprints_last,
                        fill=ECR_status_last_simplified))+
   geom_violin(draw_quantiles = c(.25, .5, .75, .95), alpha=0.5)+#, scale ="count")+
   geom_boxplot(width=0.4, outlier.shape = NA, color = "black", fill = "white",
@@ -123,37 +117,24 @@ ggbox_1b <- ggplot(data=dat_reduce,
   annotate("text", label = "bold(B)", 
            x=0.5, y = 5, parse = TRUE,
            size = 7) 
-ggbox_1b
 #figure 1c
-ggbox_1c <- ggplot(data=dat_reduce,
-                   aes(x=interact,y=fit,
-                       fill=ECR_status_first_simplified,
-                       group = interact))+
-  geom_violin(draw_quantiles = c(.25, .5, .75, .95), alpha=0.5)+
-  geom_boxplot(width= 0.4, outlier.shape = NA, color = "black", fill = "white",
-               coef =0)+
-  ylab ("Number of preprint articles") +
-  xlab ("")+
-  scale_fill_manual(values=mycol)+
+interact <- plot_model(hx, type = "int",
+                       title="",
+                       colors =mycol2,
+                       axis.title = c("", "Number of preprint articles"),
+                       #   axis.labels = c("ECR_status_first_simplified ="),
+                       legend.title = "")+
   theme_classic(
     base_size = 15,
     base_family ="Times",
   )+
-  theme(legend.title = element_blank(),
-        legend.position = "none")+
   annotate("text", label = "bold(C)", 
-           x=.6, y = 5, parse = TRUE,
-           size = 7) 
-ggbox_1c
+           x=0.5, y = 7.2, parse = TRUE,
+          size = 7) 
 
 # Combine using patchwork
-design <- c(
-  area (1,1,2),
-  area (1,2,2),
-  area(3,1,4,2)
-)
-combined_total <- ggbox_1a+ ggbox_1b+  ggbox_1c+
-  plot_layout(design=design)
+combined_total <- ggbox_1a+ ggbox_1b+interact+
+  plot_layout(ncol = 3)
 
 ggsave("graphics/Fig1_final.tiff", 
        dpi = 400, plot = combined_total,
