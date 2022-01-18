@@ -1,4 +1,4 @@
-# Analyses for Preprinting is positively associated with early career researcher status in ecology and evolution (Wolf et al. 2021)
+# Preprinting is positively associated with early career researcher status in ecology and evolution (Wolf et al. 2021)
 ### This repository the raw data and R scripts used to perform analyses and generate figures for my manuscript published in Ecology and Evolution. Detailed below are the steps this script walks you through, starting with raw data, data manipulation/filtering, running statistical models, and generating figures.
 
 If you are interested in the manuscript, see https://doi.org/10.1002/ece3.8106
